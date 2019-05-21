@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './app.jsx';
-import mockData from '../data/mock.js';
+import App from './components/App.jsx';
 
-ReactDOM.render(<App mockData={mockData} />,
+ReactDOM.render(<App />,
   document.getElementById('app'));
