@@ -1,0 +1,19 @@
+{
+  "name": "historical-events-finder",
+  "version": "1.0.0",
+  "description": "a single-page app that enables users to search and browse historical event information",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chenlwilson/mini-apps-II.git"
+  },
+  "author": "Chen Wilson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chenlwilson/mini-apps-II/issues"
+  },
+  "homepage": "https://github.com/chenlwilson/mini-apps-II#readme"
+}
