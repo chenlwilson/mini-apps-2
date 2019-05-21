@@ -11,6 +11,8 @@ export default class App extends React.Component {
     this.loadData = this.loadData.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
     this.sendSearch = this.sendSearch.bind(this);
+    this.nextPage = this.nextPage.bind(this);
+    this.prevPage = this.prevPage.bind(this);
 
     this.state = {
       events: [],
@@ -66,14 +68,35 @@ export default class App extends React.Component {
       });
   }
 
+  nextPage() {
+    const { currentPage } = this.state;
+    const next = currentPage[currentPage.length - 1] + 1;
+    const updated = currentPage.slice(1).concat(next);
+
+    this.setState({
+      currentPage: updated,
+    });
+  }
+
+  prevPage() {
+    const { currentPage } = this.state;
+    if (currentPage[0] !== 1) {
+      const prev = currentPage[0] - 1;
+      const updated = [prev].concat(currentPage.slice(0, currentPage.length - 1));
+      this.setState({
+        currentPage: updated,
+      });
+    }
+  }
+
   render() {
     const { events, word, currentPage } = this.state;
     return (
       <div className="mb-5">
         <Search word={word} updateSearch={this.updateSearch} sendSearch={this.sendSearch} />
-        <Page currentPage={currentPage} loadData={this.loadData} />
+        <Page currentPage={currentPage} loadData={this.loadData} nextPage={this.nextPage} prevPage={this.prevPage} />
         <Events events={events} />
-        <Page currentPage={currentPage} loadData={this.loadData} />
+        <Page currentPage={currentPage} loadData={this.loadData} nextPage={this.nextPage} prevPage={this.prevPage} />
       </div>
     );
   }
