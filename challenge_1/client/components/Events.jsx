@@ -1,16 +1,17 @@
 import React from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
 
 const Events = ({ events }) => (
-  <div>
+  <Container className="mt-5">
     {events.map(e => (
-      <div>
-        <div>{e.date}</div>
-        <div>{e.category2}</div>
-        <div>{e.description}</div>
-      </div>
+      <Row>
+        <Col sm={1}>{e.date}</Col>
+        <Col sm={3}>{e.category2}</Col>
+        <Col sm={8}>{e.description}</Col>
+      </Row>
     ))}
 
-  </div>
+  </Container>
 );
 
 export default Events;
