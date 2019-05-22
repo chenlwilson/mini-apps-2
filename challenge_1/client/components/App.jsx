@@ -54,15 +54,19 @@ export default class App extends React.Component {
 
     if (e.target.value.length === 0) {
       this.loadData(1);
+      this.setState({
+        pages: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        currentIndex: 0,
+      });
     }
   }
 
   fetchSearch(e) {
     e.preventDefault();
-    const { word, pages, currentIndex } = this.state;
+    const { word } = this.state;
     if (word.length > 1) {
       $.ajax({
-        url: `/events?q=${word}&_page=${pages[currentIndex]}&_limit=10`,
+        url: `/events?q=${word}`,
         type: 'GET',
         contentType: 'application/json',
       })
@@ -70,6 +74,8 @@ export default class App extends React.Component {
           console.log(res);
           this.setState({
             events: res,
+            pages: [1],
+            currentIndex: 0,
           });
         })
         .fail(() => {
@@ -97,8 +103,9 @@ export default class App extends React.Component {
 
   loadPrevPage() {
     const { pages, currentIndex } = this.state;
+    const first = pages[0];
     if (currentIndex === 0 && pages[currentIndex] > 1) {
-      this.loadData(pages[0] - 1);
+      this.loadData(first - 1);
       const prev = pages[currentIndex] - 1;
       const updated = [prev].concat(pages.slice(0, pages.length - 1));
       this.setState({
