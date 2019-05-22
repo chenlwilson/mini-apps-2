@@ -10,23 +10,26 @@ export default class App extends React.Component {
 
     this.loadData = this.loadData.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
-    this.sendSearch = this.sendSearch.bind(this);
-    this.nextPage = this.nextPage.bind(this);
-    this.prevPage = this.prevPage.bind(this);
+    this.fetchSearch = this.fetchSearch.bind(this);
+    this.loadNextPage = this.loadNextPage.bind(this);
+    this.loadPrevPage = this.loadPrevPage.bind(this);
 
     this.state = {
       events: [],
       word: '',
-      currentPage: [1, 2, 3],
+      pages: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      currentIndex: 0,
     };
   }
 
   componentDidMount() {
-    const { currentPage } = this.state;
-    this.loadData(currentPage);
+    this.loadData(1);
   }
 
   loadData(pageNumber) {
+    const { pages } = this.state;
+    const index = pages.indexOf(pageNumber) === -1 ? 9 : pages.indexOf(pageNumber);
+
     $.ajax({
       url: `/events?_page=${pageNumber}&_limit=10`,
       type: 'GET',
@@ -36,6 +39,7 @@ export default class App extends React.Component {
         console.log(res);
         this.setState({
           events: res,
+          currentIndex: index,
         });
       })
       .fail(() => {
@@ -47,56 +51,91 @@ export default class App extends React.Component {
     this.setState({
       word: e.target.value,
     });
+
+    if (e.target.value.length === 0) {
+      this.loadData(1);
+    }
   }
 
-  sendSearch(e) {
+  fetchSearch(e) {
     e.preventDefault();
-    const { word } = this.state;
-    $.ajax({
-      url: `/events?q=${word}`,
-      type: 'GET',
-      contentType: 'application/json',
-    })
-      .done((res) => {
-        console.log(res);
-        this.setState({
-          events: res,
-        });
+    const { word, pages, currentIndex } = this.state;
+    if (word.length > 1) {
+      $.ajax({
+        url: `/events?q=${word}&_page=${pages[currentIndex]}&_limit=10`,
+        type: 'GET',
+        contentType: 'application/json',
       })
-      .fail(() => {
-        console.log('fail to get search results from db.json');
-      });
+        .done((res) => {
+          console.log(res);
+          this.setState({
+            events: res,
+          });
+        })
+        .fail(() => {
+          console.log('fail to get search results from db.json');
+        });
+    }
   }
 
-  nextPage() {
-    const { currentPage } = this.state;
-    const next = currentPage[currentPage.length - 1] + 1;
-    const updated = currentPage.slice(1).concat(next);
-
-    this.setState({
-      currentPage: updated,
-    });
-  }
-
-  prevPage() {
-    const { currentPage } = this.state;
-    if (currentPage[0] !== 1) {
-      const prev = currentPage[0] - 1;
-      const updated = [prev].concat(currentPage.slice(0, currentPage.length - 1));
+  loadNextPage() {
+    const { pages, currentIndex } = this.state;
+    if (currentIndex === pages.length - 1) {
+      this.loadData(pages[pages.length - 1] + 1);
+      const next = pages[currentIndex] + 1;
+      const updated = pages.slice(1).concat(next);
       this.setState({
-        currentPage: updated,
+        pages: updated,
+      });
+    } else {
+      this.loadData(pages[currentIndex + 1]);
+      this.setState({
+        currentIndex: currentIndex + 1,
+      });
+    }
+  }
+
+  loadPrevPage() {
+    const { pages, currentIndex } = this.state;
+    if (currentIndex === 0 && pages[currentIndex] > 1) {
+      this.loadData(pages[0] - 1);
+      const prev = pages[currentIndex] - 1;
+      const updated = [prev].concat(pages.slice(0, pages.length - 1));
+      this.setState({
+        pages: updated,
+      });
+    } else if (currentIndex > 0) {
+      this.loadData(pages[currentIndex - 1]);
+      this.setState({
+        currentIndex: currentIndex - 1,
       });
     }
   }
 
   render() {
-    const { events, word, currentPage } = this.state;
+    const {
+      events, word, pages, currentIndex,
+    } = this.state;
+
+    const searchOptions = {
+      word,
+      updateSearch: this.updateSearch,
+      fetchSearch: this.fetchSearch,
+    };
+    const pageOptions = {
+      pages,
+      currentIndex,
+      loadData: this.loadData,
+      loadNextPage: this.loadNextPage,
+      loadPrevPage: this.loadPrevPage,
+    };
+
     return (
       <div className="mb-5">
-        <Search word={word} updateSearch={this.updateSearch} sendSearch={this.sendSearch} />
-        <Page currentPage={currentPage} loadData={this.loadData} nextPage={this.nextPage} prevPage={this.prevPage} />
+        <Search options={searchOptions} />
+        <Page options={pageOptions} />
         <Events events={events} />
-        <Page currentPage={currentPage} loadData={this.loadData} nextPage={this.nextPage} prevPage={this.prevPage} />
+        <Page options={pageOptions} />
       </div>
     );
   }
