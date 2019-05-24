@@ -17,8 +17,8 @@ export default class App extends React.Component {
     this.state = {
       events: [],
       word: '',
-      pages: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      currentIndex: 0,
+      currentPage: 1,
+      isSearching: false,
     };
   }
 
@@ -27,9 +27,6 @@ export default class App extends React.Component {
   }
 
   loadData(pageNumber) {
-    const { pages } = this.state;
-    const index = pages.indexOf(pageNumber) === -1 ? 9 : pages.indexOf(pageNumber);
-
     $.ajax({
       url: `/events?_page=${pageNumber}&_limit=10`,
       type: 'GET',
@@ -39,7 +36,8 @@ export default class App extends React.Component {
         console.log(res);
         this.setState({
           events: res,
-          currentIndex: index,
+          currentPage: pageNumber,
+          isSearching: false,
         });
       })
       .fail(() => {
@@ -55,8 +53,7 @@ export default class App extends React.Component {
     if (e.target.value.length === 0) {
       this.loadData(1);
       this.setState({
-        pages: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        currentIndex: 0,
+        currentPage: 1,
       });
     }
   }
@@ -74,8 +71,8 @@ export default class App extends React.Component {
           console.log(res);
           this.setState({
             events: res,
-            pages: [1],
-            currentIndex: 0,
+            currentPage: 1,
+            isSearching: true,
           });
         })
         .fail(() => {
@@ -85,43 +82,20 @@ export default class App extends React.Component {
   }
 
   loadNextPage() {
-    const { pages, currentIndex } = this.state;
-    if (currentIndex === pages.length - 1) {
-      this.loadData(pages[pages.length - 1] + 1);
-      const next = pages[currentIndex] + 1;
-      const updated = pages.slice(1).concat(next);
-      this.setState({
-        pages: updated,
-      });
-    } else {
-      this.loadData(pages[currentIndex + 1]);
-      this.setState({
-        currentIndex: currentIndex + 1,
-      });
-    }
+    const { currentPage } = this.state;
+    this.loadData(currentPage + 1);
   }
 
   loadPrevPage() {
-    const { pages, currentIndex } = this.state;
-    const first = pages[0];
-    if (currentIndex === 0 && pages[currentIndex] > 1) {
-      this.loadData(first - 1);
-      const prev = pages[currentIndex] - 1;
-      const updated = [prev].concat(pages.slice(0, pages.length - 1));
-      this.setState({
-        pages: updated,
-      });
-    } else if (currentIndex > 0) {
-      this.loadData(pages[currentIndex - 1]);
-      this.setState({
-        currentIndex: currentIndex - 1,
-      });
+    const { currentPage } = this.state;
+    if (currentPage > 1) {
+      this.loadData(currentPage - 1);
     }
   }
 
   render() {
     const {
-      events, word, pages, currentIndex,
+      events, word, currentPage,
     } = this.state;
 
     const searchOptions = {
@@ -130,8 +104,7 @@ export default class App extends React.Component {
       fetchSearch: this.fetchSearch,
     };
     const pageOptions = {
-      pages,
-      currentIndex,
+      currentPage,
       loadData: this.loadData,
       loadNextPage: this.loadNextPage,
       loadPrevPage: this.loadPrevPage,
