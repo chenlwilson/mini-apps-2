@@ -3,7 +3,7 @@ import {
   Navbar, Button, InputGroup, FormControl,
 } from 'react-bootstrap';
 
-const Search = ({ options }) => (
+const Search = ({ word, updateSearch, fetchSearch }) => (
   <Navbar bg="secondary">
     <Navbar.Brand className="ml-5 mt-4 mb-4">Historical Events</Navbar.Brand>
 
@@ -11,14 +11,14 @@ const Search = ({ options }) => (
       <FormControl
         placeholder="history is waiting..."
         type="text"
-        value={options.word}
-        onChange={(e) => { options.updateSearch(e); }}
+        value={word}
+        onChange={(e) => { updateSearch(e); }}
       />
       <InputGroup.Append>
         <Button
           variant="primary"
           type="submit"
-          onClick={(e) => { options.fetchSearch(e); }}
+          onClick={(e) => { fetchSearch(e); }}
         >
         search
         </Button>

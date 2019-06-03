@@ -2,7 +2,7 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 
 const Events = ({ events }) => (
-  <Table striped className="mt-2 ml-2 mr-5">
+  <Table hover striped className="mt-2 ml-2 mr-5">
     <thead>
       <tr>
         <th className="col-date">Date</th>
